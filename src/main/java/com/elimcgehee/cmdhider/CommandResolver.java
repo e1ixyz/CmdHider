@@ -9,6 +9,7 @@ import org.bukkit.help.HelpTopic;
 import org.bukkit.plugin.PluginManager;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -102,7 +103,7 @@ public class CommandResolver {
             logger.log(Level.WARNING, "Unable to access command map; some checks may be skipped.", e);
         }
 
-        commandMap = new SimpleCommandMap(Bukkit.getServer(), java.util.Collections.emptyMap());
+        commandMap = new SimpleCommandMap(Bukkit.getServer(), new HashMap<>());
         return commandMap;
     }
 }
