@@ -1,0 +1,17 @@
+name: CmdHider
+version: ${project.version}
+main: com.elimcgehee.cmdhider.CmdHiderPlugin
+api-version: '1.21'
+authors:
+  - Eli
+depend:
+  - LuckPerms
+commands:
+  cmdhider:
+    description: Reloads CmdHider configuration.
+    usage: /cmdhider reload
+    permission: cmdhider.admin
+permissions:
+  cmdhider.admin:
+    description: Allows reloading CmdHider.
+    default: op

@@ -1,0 +1,28 @@
+# Messages
+messages:
+  unknown-command: "&cThis command does not exist."
+  no-permission: "&cYou don't have permission."
+
+# Behavior toggles
+options:
+  # Remove namespaced/colon commands like essentials:home from the client suggestion list.
+  hide-namespaced: true
+  # Hide completions once a command has been typed (removes subcommand suggestions).
+  hide-subcommand-suggestions: true
+  # Only show commands the player can actually use (LuckPerms aware).
+  filter-by-permission: true
+  # Replace the server's default "unknown command" text.
+  replace-unknown-command: true
+  # Replace the server's default "no permission" text.
+  replace-no-permission: true
+  # Log every command filtered out (spammy).
+  debug: false
+
+# Per-command exceptions
+exceptions:
+  # Commands to always show even if they would normally be hidden.
+  always-show:
+    - help
+  # Commands to always hide.
+  always-hide:
+    - bukkit:help
