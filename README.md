@@ -12,6 +12,6 @@ Paper 1.21.10 plugin that hides commands, namespaced aliases, and subcommand sug
 - `options.hide-subcommand-suggestions` clears completions after the first argument.
 - `options.filter-by-permission` uses LuckPerms to only show usable commands.
 - `exceptions.always-show` / `exceptions.always-hide` override visibility.
+- Entries in `exceptions.always-hide` are blocked from running and return the configured no-permission message.
 
 Use `/cmdhider reload` after editing `config.yml`.
-# CmdHider

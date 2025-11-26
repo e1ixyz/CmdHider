@@ -89,6 +89,15 @@ public class CommandFilterListener implements Listener {
         String label = args[0].toLowerCase(Locale.ROOT);
         Player player = event.getPlayer();
 
+        // Block always-hide commands outright.
+        if (settings.isAlwaysHide(label)) {
+            if (settings.replaceNoPermission()) {
+                player.sendMessage(settings.noPermissionMessage());
+            }
+            event.setCancelled(true);
+            return;
+        }
+
         Command command = commandResolver.findCommand(label).orElse(null);
         if (command == null) {
             if (settings.replaceUnknownCommand()) {
@@ -98,9 +107,12 @@ public class CommandFilterListener implements Listener {
             return;
         }
 
-        if (settings.filterByPermission() && settings.replaceNoPermission()) {
+        // Standardize permission denial messaging.
+        if (settings.filterByPermission() || settings.replaceNoPermission()) {
             if (!canUseCommand(player, label, settings)) {
-                player.sendMessage(settings.noPermissionMessage());
+                if (settings.replaceNoPermission()) {
+                    player.sendMessage(settings.noPermissionMessage());
+                }
                 event.setCancelled(true);
             }
         }
@@ -143,6 +155,9 @@ public class CommandFilterListener implements Listener {
     private boolean canUseCommand(Player player, String commandLabel, HiderSettings settings) {
         if (settings.isAlwaysShow(commandLabel)) {
             return true;
+        }
+        if (settings.isAlwaysHide(commandLabel)) {
+            return false;
         }
 
         // If the command exists and declares a permission, check against LuckPerms.
