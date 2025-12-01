@@ -55,10 +55,15 @@ public class CommandFilterListener implements Listener {
             return;
         }
 
-        // Hide subcommand suggestions (anything after the first space).
+        // Hide subcommand suggestions only if the base command is already hidden.
         if (settings.hideSubcommandSuggestions() && event.getBuffer().contains(" ")) {
-            event.setCompletions(Collections.emptyList());
-            return;
+            if (event.getSender() instanceof Player player) {
+                String base = extractBaseLabel(event.getBuffer());
+                if (shouldHideCommand(player, base, settings)) {
+                    event.setCompletions(Collections.emptyList());
+                    return;
+                }
+            }
         }
 
         if (settings.hideNamespaced()) {
@@ -178,6 +183,15 @@ public class CommandFilterListener implements Listener {
         return commandResolver.findHelpTopic(commandLabel)
                 .map(topic -> topic.canSee(player))
                 .orElse(true);
+    }
+
+    private String extractBaseLabel(String buffer) {
+        String trimmed = buffer.startsWith("/") ? buffer.substring(1) : buffer;
+        int spaceIndex = trimmed.indexOf(' ');
+        if (spaceIndex >= 0) {
+            trimmed = trimmed.substring(0, spaceIndex);
+        }
+        return trimmed;
     }
 
     private void logIfDebug(HiderSettings settings, String message) {
