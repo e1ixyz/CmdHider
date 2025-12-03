@@ -1,17 +1,18 @@
-package com.elimcgehee.cmdhider;
+package com.elimcgehee.cmdhider.proxy;
 
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
-public class HiderSettings {
+public class ProxyHiderSettings {
 
     private final boolean hideNamespaced;
     private final boolean hideSubcommandSuggestions;
@@ -26,18 +27,18 @@ public class HiderSettings {
     private final String unknownCommandMessage;
     private final String noPermissionMessage;
 
-    public HiderSettings(boolean hideNamespaced,
-                         boolean hideSubcommandSuggestions,
-                         boolean filterByPermission,
-                         boolean replaceUnknownCommand,
-                         boolean replaceNoPermission,
-                         boolean debug,
-                         Set<String> alwaysShow,
-                         Set<String> alwaysHide,
-                         Map<String, Set<String>> groupAlwaysShow,
-                         Map<String, Set<String>> groupAlwaysHide,
-                         String unknownCommandMessage,
-                         String noPermissionMessage) {
+    public ProxyHiderSettings(boolean hideNamespaced,
+                              boolean hideSubcommandSuggestions,
+                              boolean filterByPermission,
+                              boolean replaceUnknownCommand,
+                              boolean replaceNoPermission,
+                              boolean debug,
+                              Set<String> alwaysShow,
+                              Set<String> alwaysHide,
+                              Map<String, Set<String>> groupAlwaysShow,
+                              Map<String, Set<String>> groupAlwaysHide,
+                              String unknownCommandMessage,
+                              String noPermissionMessage) {
         this.hideNamespaced = hideNamespaced;
         this.hideSubcommandSuggestions = hideSubcommandSuggestions;
         this.filterByPermission = filterByPermission;
@@ -52,23 +53,26 @@ public class HiderSettings {
         this.noPermissionMessage = noPermissionMessage;
     }
 
-    public static HiderSettings fromConfig(FileConfiguration config) {
-        boolean hideNamespaced = config.getBoolean("options.hide-namespaced", true);
-        boolean hideSubcommandSuggestions = config.getBoolean("options.hide-subcommand-suggestions", true);
-        boolean filterByPermission = config.getBoolean("options.filter-by-permission", true);
-        boolean replaceUnknownCommand = config.getBoolean("options.replace-unknown-command", true);
-        boolean replaceNoPermission = config.getBoolean("options.replace-no-permission", true);
-        boolean debug = config.getBoolean("options.debug", false);
+    public static ProxyHiderSettings load(Path path, Logger logger) {
+        CommentedFileConfig config = CommentedFileConfig.builder(path).autosave().build();
+        config.load();
 
-        Set<String> alwaysShow = toLowerSet(config.getStringList("exceptions.always-show"));
-        Set<String> alwaysHide = toLowerSet(config.getStringList("exceptions.always-hide"));
+        boolean hideNamespaced = config.getOrElse("options.hide-namespaced", true);
+        boolean hideSubcommandSuggestions = config.getOrElse("options.hide-subcommand-suggestions", true);
+        boolean filterByPermission = config.getOrElse("options.filter-by-permission", true);
+        boolean replaceUnknownCommand = config.getOrElse("options.replace-unknown-command", true);
+        boolean replaceNoPermission = config.getOrElse("options.replace-no-permission", true);
+        boolean debug = config.getOrElse("options.debug", false);
+
+        Set<String> alwaysShow = toLowerSet(config.getOrElse("exceptions.always-show", Collections.emptyList()));
+        Set<String> alwaysHide = toLowerSet(config.getOrElse("exceptions.always-hide", Collections.emptyList()));
         Map<String, Set<String>> groupAlwaysShow = readGroupLists(config, "exceptions.per-group", "always-show");
         Map<String, Set<String>> groupAlwaysHide = readGroupLists(config, "exceptions.per-group", "always-hide");
 
-        String unknown = colorize(config.getString("messages.unknown-command", "&cThis command does not exist."));
-        String noPerm = colorize(config.getString("messages.no-permission", "&cYou don't have permission."));
+        String unknown = config.getOrElse("messages.unknown-command", "This command does not exist.");
+        String noPerm = config.getOrElse("messages.no-permission", "You don't have permission.");
 
-        return new HiderSettings(
+        return new ProxyHiderSettings(
                 hideNamespaced,
                 hideSubcommandSuggestions,
                 filterByPermission,
@@ -96,10 +100,6 @@ public class HiderSettings {
         return Collections.unmodifiableSet(set);
     }
 
-    private static String colorize(String raw) {
-        return ChatColor.translateAlternateColorCodes('&', raw == null ? "" : raw);
-    }
-
     public boolean hideNamespaced() {
         return hideNamespaced;
     }
@@ -124,32 +124,12 @@ public class HiderSettings {
         return debug;
     }
 
-    public Set<String> alwaysShow() {
-        return alwaysShow;
-    }
-
-    public Set<String> alwaysHide() {
-        return alwaysHide;
-    }
-
-    public Map<String, Set<String>> groupAlwaysShow() {
-        return groupAlwaysShow;
-    }
-
-    public Map<String, Set<String>> groupAlwaysHide() {
-        return groupAlwaysHide;
-    }
-
     public String unknownCommandMessage() {
         return unknownCommandMessage;
     }
 
     public String noPermissionMessage() {
         return noPermissionMessage;
-    }
-
-    public boolean isAlwaysShow(String commandLabel) {
-        return isAlwaysShow(commandLabel, null);
     }
 
     public boolean isAlwaysShow(String commandLabel, String group) {
@@ -159,10 +139,6 @@ public class HiderSettings {
             return true;
         }
         return matches(normalized, alwaysShow);
-    }
-
-    public boolean isAlwaysHide(String commandLabel) {
-        return isAlwaysHide(commandLabel, null);
     }
 
     public boolean isAlwaysHide(String commandLabel, String group) {
@@ -201,15 +177,15 @@ public class HiderSettings {
         return checkBase(normalized, set);
     }
 
-    private static Map<String, Set<String>> readGroupLists(FileConfiguration config, String basePath, String listName) {
+    private static Map<String, Set<String>> readGroupLists(Config config, String basePath, String listName) {
         Map<String, Set<String>> map = new HashMap<>();
-        ConfigurationSection section = config.getConfigurationSection(basePath);
-        if (section == null) {
+        Object maybeSection = config.get(basePath);
+        if (!(maybeSection instanceof Config section)) {
             return Collections.emptyMap();
         }
-        for (String key : section.getKeys(false)) {
+        for (String key : section.valueMap().keySet()) {
             String path = basePath + "." + key + "." + listName;
-            Set<String> values = toLowerSet(config.getStringList(path));
+            Set<String> values = toLowerSet(config.getOrElse(path, Collections.emptyList()));
             map.put(normalizeGroup(key), values);
         }
         return Collections.unmodifiableMap(map);

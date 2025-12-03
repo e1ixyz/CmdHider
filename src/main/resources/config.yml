@@ -7,7 +7,7 @@ messages:
 options:
   # Remove namespaced/colon commands like essentials:home from the client suggestion list.
   hide-namespaced: true
-  # Hide completions once a command has been typed (removes subcommand suggestions).
+  # Hide completions once a command has been typed (removes subcommand suggestions) when the base command is hidden.
   hide-subcommand-suggestions: true
   # Only show commands the player can actually use (LuckPerms aware).
   filter-by-permission: true
@@ -23,6 +23,11 @@ exceptions:
   # Commands to always show even if they would normally be hidden.
   always-show:
     - help
-  # Commands to always hide.
-  always-hide:
-    - bukkit:help
+  # Per-group visibility overrides (LuckPerms primary group name)
+  per-group:
+    default:
+      always-hide:
+        - bukkit:help
+      always-show: [ ]
+  # Commands to always hide for everyone (applied after group overrides).
+  always-hide: [ ]

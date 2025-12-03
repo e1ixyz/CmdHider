@@ -1,0 +1,14 @@
+{
+  "id": "cmdhider",
+  "name": "CmdHider",
+  "version": "1.0.0",
+  "description": "Velocity proxy command hider with LuckPerms",
+  "authors": ["Eli"],
+  "dependencies": [
+    {
+      "id": "luckperms",
+      "optional": false
+    }
+  ],
+  "main": "com.elimcgehee.cmdhider.proxy.ProxyCmdHiderPlugin"
+}

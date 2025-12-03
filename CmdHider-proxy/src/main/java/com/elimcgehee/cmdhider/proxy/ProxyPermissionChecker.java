@@ -1,17 +1,17 @@
-package com.elimcgehee.cmdhider;
+package com.elimcgehee.cmdhider.proxy;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.util.Tristate;
-import org.bukkit.entity.Player;
+import com.velocitypowered.api.proxy.Player;
 
 import java.util.Locale;
 
-public class PermissionChecker {
+public class ProxyPermissionChecker {
 
     private final LuckPerms luckPerms;
 
-    public PermissionChecker(LuckPerms luckPerms) {
+    public ProxyPermissionChecker(LuckPerms luckPerms) {
         this.luckPerms = luckPerms;
     }
 

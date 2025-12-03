@@ -40,9 +40,10 @@ public class CommandFilterListener implements Listener {
             return;
         }
         Player player = event.getPlayer();
+        String group = permissionChecker.getPrimaryGroup(player);
         Collection<String> commands = event.getCommands();
 
-        commands.removeIf(cmd -> shouldHideCommand(player, cmd, settings));
+        commands.removeIf(cmd -> shouldHideCommand(player, cmd, settings, group));
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -55,11 +56,16 @@ public class CommandFilterListener implements Listener {
             return;
         }
 
+        String group = null;
+        if (event.getSender() instanceof Player player) {
+            group = permissionChecker.getPrimaryGroup(player);
+        }
+
         // Hide subcommand suggestions only if the base command is already hidden.
         if (settings.hideSubcommandSuggestions() && event.getBuffer().contains(" ")) {
             if (event.getSender() instanceof Player player) {
                 String base = extractBaseLabel(event.getBuffer());
-                if (shouldHideCommand(player, base, settings)) {
+                if (shouldHideCommand(player, base, settings, group)) {
                     event.setCompletions(Collections.emptyList());
                     return;
                 }
@@ -68,7 +74,7 @@ public class CommandFilterListener implements Listener {
 
         if (settings.hideNamespaced()) {
             List<String> filtered = event.getCompletions().stream()
-                    .filter(completion -> shouldKeepCompletion(completion, settings))
+                    .filter(completion -> shouldKeepCompletion(completion, settings, group))
                     .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
             event.setCompletions(filtered);
         }
@@ -93,9 +99,10 @@ public class CommandFilterListener implements Listener {
 
         String label = args[0].toLowerCase(Locale.ROOT);
         Player player = event.getPlayer();
+        String group = permissionChecker.getPrimaryGroup(player);
 
         // Block always-hide commands outright.
-        if (settings.isAlwaysHide(label)) {
+        if (settings.isAlwaysHide(label, group)) {
             if (settings.replaceNoPermission()) {
                 player.sendMessage(settings.noPermissionMessage());
             }
@@ -114,7 +121,7 @@ public class CommandFilterListener implements Listener {
 
         // Standardize permission denial messaging.
         if (settings.filterByPermission() || settings.replaceNoPermission()) {
-            if (!canUseCommand(player, label, settings)) {
+            if (!canUseCommand(player, label, settings, group)) {
                 if (settings.replaceNoPermission()) {
                     player.sendMessage(settings.noPermissionMessage());
                 }
@@ -123,23 +130,23 @@ public class CommandFilterListener implements Listener {
         }
     }
 
-    private boolean shouldKeepCompletion(String completion, HiderSettings settings) {
+    private boolean shouldKeepCompletion(String completion, HiderSettings settings, String group) {
         String normalized = completion.toLowerCase(Locale.ROOT);
-        if (settings.isAlwaysShow(normalized)) {
+        if (settings.isAlwaysShow(normalized, group)) {
             return true;
         }
-        if (settings.isAlwaysHide(normalized)) {
+        if (settings.isAlwaysHide(normalized, group)) {
             return false;
         }
         return !settings.hideNamespaced() || !normalized.contains(":");
     }
 
-    private boolean shouldHideCommand(Player player, String commandLabel, HiderSettings settings) {
+    private boolean shouldHideCommand(Player player, String commandLabel, HiderSettings settings, String group) {
         String normalized = commandLabel.toLowerCase(Locale.ROOT);
-        if (settings.isAlwaysShow(normalized)) {
+        if (settings.isAlwaysShow(normalized, group)) {
             return false;
         }
-        if (settings.isAlwaysHide(normalized)) {
+        if (settings.isAlwaysHide(normalized, group)) {
             logIfDebug(settings, "Hiding " + normalized + " because it is in always-hide.");
             return true;
         }
@@ -149,7 +156,7 @@ public class CommandFilterListener implements Listener {
             return true;
         }
 
-        if (settings.filterByPermission() && !canUseCommand(player, normalized, settings)) {
+        if (settings.filterByPermission() && !canUseCommand(player, normalized, settings, group)) {
             logIfDebug(settings, "Hiding " + normalized + " because player lacks permission.");
             return true;
         }
@@ -157,11 +164,11 @@ public class CommandFilterListener implements Listener {
         return false;
     }
 
-    private boolean canUseCommand(Player player, String commandLabel, HiderSettings settings) {
-        if (settings.isAlwaysShow(commandLabel)) {
+    private boolean canUseCommand(Player player, String commandLabel, HiderSettings settings, String group) {
+        if (settings.isAlwaysShow(commandLabel, group)) {
             return true;
         }
-        if (settings.isAlwaysHide(commandLabel)) {
+        if (settings.isAlwaysHide(commandLabel, group)) {
             return false;
         }
 

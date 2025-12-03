@@ -1,0 +1,19 @@
+[messages]
+unknown-command = "This command does not exist."
+no-permission = "You don't have permission."
+
+[options]
+hide-namespaced = true
+hide-subcommand-suggestions = true
+filter-by-permission = true
+replace-unknown-command = true
+replace-no-permission = true
+debug = false
+
+[exceptions]
+always-show = ["help"]
+always-hide = []
+
+[exceptions.per-group.default]
+always-show = []
+always-hide = []
