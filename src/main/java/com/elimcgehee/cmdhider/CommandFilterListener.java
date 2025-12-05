@@ -56,10 +56,9 @@ public class CommandFilterListener implements Listener {
             return;
         }
 
-        String group = null;
-        if (event.getSender() instanceof Player player) {
-            group = permissionChecker.getPrimaryGroup(player);
-        }
+        final String group = (event.getSender() instanceof Player player)
+                ? permissionChecker.getPrimaryGroup(player)
+                : null;
 
         // Hide subcommand suggestions only if the base command is already hidden.
         if (settings.hideSubcommandSuggestions() && event.getBuffer().contains(" ")) {
