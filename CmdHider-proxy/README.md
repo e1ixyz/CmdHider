@@ -10,6 +10,7 @@ Velocity proxy (3.3.x) version of CmdHider that hides commands and namespaced al
 - `messages.unknown-command` / `messages.no-permission` customize responses.
 - `options.hide-namespaced`, `options.hide-subcommand-suggestions`, `options.filter-by-permission`, `options.replace-*`, `options.debug` mirror the Paper plugin.
 - `exceptions.per-group.<group>.always-hide` / `.always-show` apply to LuckPerms primary groups (e.g., `default`); `exceptions.always-*` are global overrides.
+- Default config hides sensitive commands for the `default` group: `ban`, `banlist`, `ipban`, `lpv`, `luckpermsvelocity`, `mannouncer`, `mt`, `mute`, `mutelist`, `mv`, `reporthistory`, `reports`, `servermanager`, `sm`, `unban`, `warn`, `warnlist`.
 - Commands in any `always-hide` are blocked and return the configured no-permission message.
 
 Drop the jar into Velocity's `plugins/` directory; a default `config.toml` will be generated on first run.
