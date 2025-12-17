@@ -77,12 +77,9 @@ public class ProxyCommandFilter {
             return;
         }
 
-        boolean exists = server.getCommandManager().hasCommand(label);
-        if (!exists) {
-            if (settings.replaceUnknownCommand()) {
-                player.sendMessage(plugin.format(settings.unknownCommandMessage()));
-            }
-            event.setResult(CommandResult.denied());
+        boolean proxyCommand = server.getCommandManager().hasCommand(label);
+        if (!proxyCommand) {
+            // Not a Velocity command; let the backend server handle permissions/unknown command replies.
             return;
         }
 
