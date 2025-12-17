@@ -16,4 +16,22 @@ always-hide = []
 
 [exceptions.per-group.default]
 always-show = []
-always-hide = []
+always-hide = [
+  "ban",
+  "banlist",
+  "ipban",
+  "lpv",
+  "luckpermsvelocity",
+  "mannouncer",
+  "mt",
+  "mute",
+  "mutelist",
+  "mv",
+  "reporthistory",
+  "reports",
+  "servermanager",
+  "sm",
+  "unban",
+  "warn",
+  "warnlist"
+]
