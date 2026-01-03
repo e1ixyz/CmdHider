@@ -1,4 +1,5 @@
 [messages]
+# Leave a message blank to suppress output entirely for that case.
 unknown-command = "This command does not exist."
 no-permission = "You don't have permission."
 

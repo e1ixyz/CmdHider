@@ -102,7 +102,7 @@ public class CommandFilterListener implements Listener {
 
         // Block always-hide commands outright.
         if (settings.isAlwaysHide(label, group)) {
-            if (settings.replaceNoPermission()) {
+            if (settings.replaceNoPermission() && settings.hasNoPermissionMessage()) {
                 player.sendMessage(settings.noPermissionMessage());
             }
             event.setCancelled(true);
@@ -112,7 +112,9 @@ public class CommandFilterListener implements Listener {
         Command command = commandResolver.findCommand(label).orElse(null);
         if (command == null) {
             if (settings.replaceUnknownCommand()) {
-                player.sendMessage(settings.unknownCommandMessage());
+                if (settings.hasUnknownCommandMessage()) {
+                    player.sendMessage(settings.unknownCommandMessage());
+                }
                 event.setCancelled(true);
             }
             return;
@@ -121,7 +123,7 @@ public class CommandFilterListener implements Listener {
         // Standardize permission denial messaging.
         if (settings.filterByPermission() || settings.replaceNoPermission()) {
             if (!canUseCommand(player, label, settings, group)) {
-                if (settings.replaceNoPermission()) {
+                if (settings.replaceNoPermission() && settings.hasNoPermissionMessage()) {
                     player.sendMessage(settings.noPermissionMessage());
                 }
                 event.setCancelled(true);

@@ -69,8 +69,8 @@ public class ProxyHiderSettings {
         Map<String, Set<String>> groupAlwaysShow = readGroupLists(config, "exceptions.per-group", "always-show");
         Map<String, Set<String>> groupAlwaysHide = readGroupLists(config, "exceptions.per-group", "always-hide");
 
-        String unknown = config.getOrElse("messages.unknown-command", "This command does not exist.");
-        String noPerm = config.getOrElse("messages.no-permission", "You don't have permission.");
+        String unknown = sanitizeMessage(config.getOrElse("messages.unknown-command", "This command does not exist."));
+        String noPerm = sanitizeMessage(config.getOrElse("messages.no-permission", "You don't have permission."));
 
         return new ProxyHiderSettings(
                 hideNamespaced,
@@ -130,6 +130,14 @@ public class ProxyHiderSettings {
 
     public String noPermissionMessage() {
         return noPermissionMessage;
+    }
+
+    public boolean hasUnknownCommandMessage() {
+        return !unknownCommandMessage.isBlank();
+    }
+
+    public boolean hasNoPermissionMessage() {
+        return !noPermissionMessage.isBlank();
     }
 
     public boolean isAlwaysShow(String commandLabel, String group) {
@@ -196,5 +204,12 @@ public class ProxyHiderSettings {
             return "default";
         }
         return group.toLowerCase(Locale.ROOT);
+    }
+
+    private static String sanitizeMessage(Object value) {
+        if (value == null) {
+            return "";
+        }
+        return String.valueOf(value);
     }
 }

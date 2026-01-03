@@ -148,6 +148,14 @@ public class HiderSettings {
         return noPermissionMessage;
     }
 
+    public boolean hasUnknownCommandMessage() {
+        return !unknownCommandMessage.isBlank();
+    }
+
+    public boolean hasNoPermissionMessage() {
+        return !noPermissionMessage.isBlank();
+    }
+
     public boolean isAlwaysShow(String commandLabel) {
         return isAlwaysShow(commandLabel, null);
     }

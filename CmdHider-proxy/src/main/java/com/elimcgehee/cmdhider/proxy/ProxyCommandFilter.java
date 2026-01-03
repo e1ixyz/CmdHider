@@ -70,7 +70,7 @@ public class ProxyCommandFilter {
         String group = permissionChecker.getPrimaryGroup(player);
 
         if (settings.isAlwaysHide(label, group)) {
-            if (settings.replaceNoPermission()) {
+            if (settings.replaceNoPermission() && settings.hasNoPermissionMessage()) {
                 player.sendMessage(plugin.format(settings.noPermissionMessage()));
             }
             event.setResult(CommandResult.denied());
@@ -85,7 +85,7 @@ public class ProxyCommandFilter {
 
         if (settings.filterByPermission() || settings.replaceNoPermission()) {
             if (!canUseCommand(player, label, settings, group)) {
-                if (settings.replaceNoPermission()) {
+                if (settings.replaceNoPermission() && settings.hasNoPermissionMessage()) {
                     player.sendMessage(plugin.format(settings.noPermissionMessage()));
                 }
                 event.setResult(CommandResult.denied());

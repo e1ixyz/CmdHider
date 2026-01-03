@@ -50,7 +50,10 @@ public class CmdHiderPlugin extends JavaPlugin {
         }
 
         if (!sender.hasPermission("cmdhider.admin")) {
-            sender.sendMessage(getSettings().noPermissionMessage());
+            HiderSettings settings = getSettings();
+            if (settings != null && settings.hasNoPermissionMessage()) {
+                sender.sendMessage(settings.noPermissionMessage());
+            }
             return true;
         }
 
